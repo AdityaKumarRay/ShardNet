@@ -23,6 +23,14 @@ ShardNet is a production-minded, BitTorrent-inspired file sharing system with a 
 - Chunk integrity checks and final file hash verification added to local store flow.
 - CLI command added to generate file manifests from local files.
 
+## Milestone 3 Status
+
+- TCP peer protocol framing added with versioned message envelopes.
+- Async peer server added for handshake and chunk serving.
+- Async peer client added with retry-capable chunk requests.
+- Share catalog store added for local file registration and verified chunk reads.
+- Protocol tests added for chunk roundtrip, missing piece errors, and retry failure path.
+
 ## Repository Layout
 
 - `src/shardnet/common`: shared constants, settings, logging, and error model.
@@ -97,4 +105,4 @@ shardnet client info
 
 ## Next Milestone
 
-Milestone 3 introduces peer protocol messaging and chunk transfer plumbing over TCP.
+Milestone 4 wires tracker discovery and peer transfer into a full end-to-end download flow.
