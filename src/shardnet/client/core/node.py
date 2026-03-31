@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import inspect
+from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from pathlib import Path
 
@@ -14,7 +16,7 @@ from shardnet.client.core.share_store import ShareStore
 from shardnet.client.core.tracker_client import TrackerClient
 from shardnet.common.errors import TransferError
 from shardnet.common.logging import get_logger
-from shardnet.tracker.schemas import SwarmPeerResponse
+from shardnet.tracker.schemas import SwarmPeerResponse, SwarmResponse
 
 
 class PeerNode:
@@ -109,6 +111,7 @@ class PeerNode:
         info_hash: str,
         target_path: str | Path,
         max_chunks: int | None = None,
+        progress_callback: (Callable[[DownloadProgress], Awaitable[None] | None] | None) = None,
     ) -> DownloadProgress:
         """Download missing chunks from peers and resume from local state when available."""
 
@@ -146,6 +149,11 @@ class PeerNode:
                 chunk_index=chunk_index,
                 chunk_data=chunk_data,
             )
+
+            if progress_callback is not None:
+                interim_progress = self._download_store.get_progress(info_hash)
+                await _dispatch_progress(progress_callback, interim_progress)
+
             completed_this_call += 1
 
             if max_chunks is not None and completed_this_call >= max_chunks:
@@ -174,7 +182,15 @@ class PeerNode:
                 missing_chunks=len(current.missing_chunks),
             )
 
+        if progress_callback is not None:
+            await _dispatch_progress(progress_callback, current)
+
         return current
+
+    async def get_swarm(self, info_hash: str) -> SwarmResponse:
+        """Return tracker swarm state for an info_hash."""
+
+        return await self._tracker_client.get_swarm(info_hash=info_hash)
 
     async def _heartbeat_loop(self) -> None:
         while self._running:
@@ -197,3 +213,12 @@ def _select_peer_for_chunk(
         if chunk_index in peer.available_chunks:
             return peer
     return None
+
+
+async def _dispatch_progress(
+    callback: Callable[[DownloadProgress], Awaitable[None] | None],
+    progress: DownloadProgress,
+) -> None:
+    maybe_awaitable = callback(progress)
+    if inspect.isawaitable(maybe_awaitable):
+        await maybe_awaitable

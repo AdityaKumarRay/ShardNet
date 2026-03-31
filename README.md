@@ -47,12 +47,21 @@ ShardNet is a production-minded, BitTorrent-inspired file sharing system with a 
 - CLI `status` command added for local download progress inspection.
 - CLI behavior is backed by the same shared client core used by integration tests.
 
+## Milestone 6 Status
+
+- Local desktop agent API added to manage node lifecycle, sharing, queueing downloads, and swarm lookup.
+- Electron desktop client added with a full UI for node controls, sharing, download queue, chunk map, and swarm status.
+- Desktop app starts the local Python agent automatically in development mode.
+- Animated queue bars and live chunk map updates are driven by polling agent job state.
+
 ## Repository Layout
 
 - `src/shardnet/common`: shared constants, settings, logging, and error model.
 - `src/shardnet/client/core`: shared manifesting and resumable download state logic.
 - `src/shardnet/tracker`: tracker API factory and process entrypoint.
 - `src/shardnet/cli`: CLI surface powered by shared core modules.
+- `src/shardnet/client/agent`: local FastAPI control surface used by desktop UI.
+- `desktop`: Electron desktop application and packaging config.
 - `tests/unit`: unit tests for shared core, settings/constants, and tracker API behavior.
 - `tests/integration`: tracker + peer end-to-end flow tests.
 
@@ -70,6 +79,18 @@ Run tracker locally:
 
 ```bash
 make run-tracker
+```
+
+Run local desktop agent only:
+
+```bash
+make run-agent
+```
+
+Run desktop app:
+
+```bash
+make run-desktop
 ```
 
 Run tracker in Docker:
@@ -120,6 +141,14 @@ Inspect local download status:
 shardnet client status <INFO_HASH>
 ```
 
+Desktop packaging commands:
+
+```bash
+cd desktop
+npm install
+npm run dist
+```
+
 ## Tracker API (MVP)
 
 - `POST /api/v1/peers/register`: register or refresh peer endpoint metadata.
@@ -146,4 +175,4 @@ shardnet client info
 
 ## Next Milestone
 
-Milestone 6 introduces the desktop UI client powered by the shared core runtime.
+Milestone 7 finalizes packaging/release workflow and deployment documentation.

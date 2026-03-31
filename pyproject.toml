@@ -29,6 +29,7 @@ dev = [
 
 [project.scripts]
 shardnet = "shardnet.cli.main:run"
+shardnet-agent = "shardnet.client.agent.main:run"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/shardnet"]

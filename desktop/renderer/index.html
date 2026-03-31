@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShardNet Desktop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient"></div>
+    <header class="topbar">
+      <div>
+        <h1>ShardNet Desktop</h1>
+        <p>Tracker-coordinated peer-to-peer downloads with live chunk telemetry.</p>
+      </div>
+      <div class="badge" id="agent-status">Agent: connecting...</div>
+    </header>
+
+    <main class="layout">
+      <section class="panel control-panel">
+        <h2>Node Control</h2>
+        <form id="node-form" class="grid-form">
+          <label>
+            Peer ID
+            <input id="peer-id" placeholder="peer-desktop" />
+          </label>
+          <label>
+            Host
+            <input id="host" value="127.0.0.1" />
+          </label>
+          <label>
+            Port
+            <input id="port" type="number" value="9000" />
+          </label>
+          <label>
+            Data Dir
+            <input id="data-dir" value="./data/client-desktop" />
+          </label>
+          <label>
+            Tracker URL
+            <input id="tracker-url" value="http://127.0.0.1:8000" />
+          </label>
+          <div class="actions">
+            <button type="submit">Start Node</button>
+            <button type="button" id="stop-node" class="ghost">Stop</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel control-panel">
+        <h2>Share File</h2>
+        <form id="share-form" class="grid-form">
+          <label>
+            File Path
+            <div class="inline-input">
+              <input id="share-file" placeholder="Choose a file..." />
+              <button type="button" id="browse-share" class="ghost">Browse</button>
+            </div>
+          </label>
+          <label>
+            Chunk Size (bytes)
+            <input id="share-chunk-size" type="number" value="262144" />
+          </label>
+          <div class="actions">
+            <button type="submit">Share</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel control-panel">
+        <h2>Download</h2>
+        <form id="download-form" class="grid-form">
+          <label>
+            Info Hash
+            <input id="download-info-hash" placeholder="64-char hash" />
+          </label>
+          <label>
+            Target Path
+            <div class="inline-input">
+              <input id="download-target" placeholder="Choose output file..." />
+              <button type="button" id="browse-target" class="ghost">Browse</button>
+            </div>
+          </label>
+          <div class="actions">
+            <button type="submit">Queue Download</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel queue-panel">
+        <h2>Download Queue</h2>
+        <div id="queue-list" class="queue-list"></div>
+      </section>
+
+      <section class="panel chunk-panel">
+        <h2>Chunk Map</h2>
+        <div id="chunk-summary" class="mono muted">Select a running/completed job to inspect chunks.</div>
+        <div id="chunk-grid" class="chunk-grid"></div>
+      </section>
+
+      <section class="panel swarm-panel">
+        <h2>Swarm Status</h2>
+        <div id="swarm-meta" class="mono muted">No info hash selected.</div>
+        <div id="swarm-table" class="swarm-table"></div>
+      </section>
+
+      <section class="panel log-panel">
+        <h2>Activity</h2>
+        <div id="activity-log" class="activity-log"></div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
