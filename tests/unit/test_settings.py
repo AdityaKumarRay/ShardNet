@@ -17,3 +17,5 @@ def test_client_defaults() -> None:
     assert settings.protocol_version == 1
     assert settings.tracker_base_url.startswith("http://")
     assert settings.default_chunk_size_bytes == 262_144
+    assert settings.heartbeat_interval_seconds == 30
+    assert settings.request_timeout_seconds == 5.0

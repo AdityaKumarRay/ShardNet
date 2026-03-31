@@ -39,6 +39,14 @@ ShardNet is a production-minded, BitTorrent-inspired file sharing system with a 
 - Tracker metadata upgraded to include chunk hash lists for independent chunk integrity validation.
 - Integration tests added for full transfer and interruption/resume scenarios.
 
+## Milestone 5 Status
+
+- CLI now supports running a persistent peer node.
+- CLI `share` command added for announcing and serving files.
+- CLI `download` command added for tracker-discovered chunk retrieval and resume.
+- CLI `status` command added for local download progress inspection.
+- CLI behavior is backed by the same shared client core used by integration tests.
+
 ## Repository Layout
 
 - `src/shardnet/common`: shared constants, settings, logging, and error model.
@@ -46,6 +54,7 @@ ShardNet is a production-minded, BitTorrent-inspired file sharing system with a 
 - `src/shardnet/tracker`: tracker API factory and process entrypoint.
 - `src/shardnet/cli`: CLI surface powered by shared core modules.
 - `tests/unit`: unit tests for shared core, settings/constants, and tracker API behavior.
+- `tests/integration`: tracker + peer end-to-end flow tests.
 
 ## Local Development
 
@@ -87,6 +96,30 @@ Generate a client file manifest:
 shardnet client manifest ./path/to/file.bin --chunk-size 262144
 ```
 
+Start a peer node and immediately share files:
+
+```bash
+shardnet client run --share-file ./seed.bin --tracker-url http://127.0.0.1:8000
+```
+
+Share one file directly:
+
+```bash
+shardnet client share ./seed.bin --tracker-url http://127.0.0.1:8000
+```
+
+Download by info-hash:
+
+```bash
+shardnet client download <INFO_HASH> ./downloads/seed.bin --tracker-url http://127.0.0.1:8000
+```
+
+Inspect local download status:
+
+```bash
+shardnet client status <INFO_HASH>
+```
+
 ## Tracker API (MVP)
 
 - `POST /api/v1/peers/register`: register or refresh peer endpoint metadata.
@@ -113,4 +146,4 @@ shardnet client info
 
 ## Next Milestone
 
-Milestone 5 expands the CLI into practical share/download/status commands powered by the shared node core.
+Milestone 6 introduces the desktop UI client powered by the shared core runtime.
