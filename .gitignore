@@ -1,0 +1,55 @@
+# Agent and scratch files
+AGENT_STATE.md
+Plan.md
+plan.md
+_agent/
+**/_agent/
+
+# Secrets and environment files
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Node / desktop artifacts
+node_modules/
+desktop/node_modules/
+desktop/dist/
+desktop/out/
+desktop/release/
+
+# Runtime state and generated data
+data/
+*.db
+*.sqlite
+*.sqlite3
+logs/
+*.log
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
