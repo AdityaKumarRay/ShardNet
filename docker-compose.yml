@@ -1,0 +1,16 @@
+services:
+  tracker:
+    build:
+      context: .
+      dockerfile: deploy/docker/tracker.Dockerfile
+    container_name: shardnet-tracker
+    ports:
+      - "8000:8000"
+    environment:
+      TRACKER_HOST: "0.0.0.0"
+      TRACKER_PORT: "8000"
+      TRACKER_DATABASE_URL: "sqlite:///./data/tracker.db"
+      TRACKER_HEARTBEAT_TTL_SECONDS: "120"
+      TRACKER_LOG_LEVEL: "INFO"
+    volumes:
+      - ./data:/app/data

@@ -9,6 +9,7 @@ description = "Production-minded BitTorrent-inspired P2P file sharing system."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiosqlite>=0.20,<1.0",
     "fastapi>=0.111,<1.0",
     "pydantic>=2.8,<3.0",
     "pydantic-settings>=2.3,<3.0",
