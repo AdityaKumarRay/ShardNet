@@ -16,12 +16,20 @@ ShardNet is a production-minded, BitTorrent-inspired file sharing system with a 
 - Integration-style API tests added for success and error paths.
 - Docker image and compose flow added for tracker deployment/local runtime.
 
+## Milestone 2 Status
+
+- Shared client core added for manifest generation and chunk hashing.
+- Resumable download state store added with SQLite-backed chunk completion tracking.
+- Chunk integrity checks and final file hash verification added to local store flow.
+- CLI command added to generate file manifests from local files.
+
 ## Repository Layout
 
 - `src/shardnet/common`: shared constants, settings, logging, and error model.
+- `src/shardnet/client/core`: shared manifesting and resumable download state logic.
 - `src/shardnet/tracker`: tracker API factory and process entrypoint.
 - `src/shardnet/cli`: CLI surface powered by shared core modules.
-- `tests/unit`: baseline test coverage for constants, settings, and tracker endpoints.
+- `tests/unit`: unit tests for shared core, settings/constants, and tracker API behavior.
 
 ## Local Development
 
@@ -57,6 +65,12 @@ Or with CLI:
 shardnet tracker run
 ```
 
+Generate a client file manifest:
+
+```bash
+shardnet client manifest ./path/to/file.bin --chunk-size 262144
+```
+
 ## Tracker API (MVP)
 
 - `POST /api/v1/peers/register`: register or refresh peer endpoint metadata.
@@ -75,12 +89,12 @@ Tracker environment variables:
 - `TRACKER_HEARTBEAT_TTL_SECONDS` (default `120`)
 - `TRACKER_LOG_LEVEL` (default `INFO`)
 
-Client-related milestones continue next; current CLI tracker command remains available.
+Client core now supports local manifesting and resumable state persistence.
 
 ```bash
-shardnet tracker run --host 0.0.0.0 --port 8000
+shardnet client info
 ```
 
 ## Next Milestone
 
-Milestone 2 introduces chunk manifesting, hashing, and resumable client-side state in the shared client core.
+Milestone 3 introduces peer protocol messaging and chunk transfer plumbing over TCP.

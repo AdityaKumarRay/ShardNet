@@ -1,9 +1,13 @@
 """CLI surface for tracker and peer workflows."""
 
+from pathlib import Path
+from typing import Annotated
+
 import typer
 import uvicorn
 
-from shardnet.common.config import TrackerSettings
+from shardnet.client.core.manifest import build_file_manifest
+from shardnet.common.config import ClientSettings, TrackerSettings
 from shardnet.common.constants import API_VERSION, PROTOCOL_VERSION
 from shardnet.common.logging import configure_logging, get_logger
 
@@ -50,10 +54,43 @@ def tracker_run(
 def client_info() -> None:
     """Show baseline client runtime details."""
 
+    settings = ClientSettings()
     typer.echo(
-        "Client core is scaffolded for milestone-based delivery. "
-        "Chunking and transfer arrive in the next milestones."
+        "Client core supports manifest + chunk hashing and resumable local download state. "
+        f"Default chunk size: {settings.default_chunk_size_bytes} bytes."
     )
+
+
+@client_app.command("manifest")
+def client_manifest(
+    file_path: Annotated[
+        Path,
+        typer.Argument(
+            ...,
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+            help="File to hash and split into chunk metadata.",
+        ),
+    ],
+    chunk_size_bytes: Annotated[
+        int | None,
+        typer.Option(
+            "--chunk-size",
+            "-c",
+            min=1,
+            help="Chunk size in bytes. Uses client default when omitted.",
+        ),
+    ] = None,
+) -> None:
+    """Generate a file manifest from local disk."""
+
+    settings = ClientSettings()
+    resolved_chunk_size = chunk_size_bytes or settings.default_chunk_size_bytes
+    manifest = build_file_manifest(file_path, resolved_chunk_size)
+    typer.echo(manifest.model_dump_json(indent=2))
 
 
 def run() -> None:

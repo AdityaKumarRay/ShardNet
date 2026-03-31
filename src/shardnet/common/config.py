@@ -3,7 +3,7 @@
 from pydantic import Field, PositiveInt
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from shardnet.common.constants import API_PREFIX, PROTOCOL_VERSION
+from shardnet.common.constants import API_PREFIX, DEFAULT_CHUNK_SIZE_BYTES, PROTOCOL_VERSION
 
 
 class ShardNetSettings(BaseSettings):
@@ -39,6 +39,7 @@ class ClientSettings(ShardNetSettings):
     data_dir: str = Field(default="./data/client")
     tracker_base_url: str = Field(default="http://127.0.0.1:8000")
     protocol_version: int = Field(default=PROTOCOL_VERSION)
+    default_chunk_size_bytes: PositiveInt = Field(default=DEFAULT_CHUNK_SIZE_BYTES)
 
     model_config = SettingsConfigDict(
         env_prefix="CLIENT_",
