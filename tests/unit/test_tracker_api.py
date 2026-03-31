@@ -9,6 +9,12 @@ from shardnet.tracker.api import create_app
 
 INFO_HASH = "7e0e67f8de177f4f74cb5adf4f4a5749eb10c54ad5f2e26567835f1227dc8cf8"
 FILE_SHA256 = "22f7d0a4e39ca232f47de31f03ec6e0f58bdf2c56034d713f026ba31f4f5e9aa"
+CHUNK_HASHES = [
+    "1111111111111111111111111111111111111111111111111111111111111111",
+    "2222222222222222222222222222222222222222222222222222222222222222",
+    "3333333333333333333333333333333333333333333333333333333333333333",
+    "4444444444444444444444444444444444444444444444444444444444444444",
+]
 
 
 @pytest.fixture
@@ -56,6 +62,7 @@ def _announce_payload(
         "chunk_size_bytes": 1024,
         "total_chunks": 4,
         "file_sha256": FILE_SHA256,
+        "chunk_sha256": CHUNK_HASHES,
         "available_chunks": available_chunks,
     }
 
@@ -127,6 +134,7 @@ async def test_announce_and_swarm_lookup(client: AsyncClient) -> None:
     assert swarm_response.status_code == 200
     assert swarm_payload["swarm_size"] == 2
     assert swarm_payload["seed_count"] == 1
+    assert swarm_payload["chunk_sha256"] == CHUNK_HASHES
 
     peer_ids = {peer["peer_id"] for peer in swarm_payload["peers"]}
     assert peer_ids == {"peer-a", "peer-b"}

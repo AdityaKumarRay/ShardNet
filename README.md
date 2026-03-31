@@ -31,6 +31,14 @@ ShardNet is a production-minded, BitTorrent-inspired file sharing system with a 
 - Share catalog store added for local file registration and verified chunk reads.
 - Protocol tests added for chunk roundtrip, missing piece errors, and retry failure path.
 
+## Milestone 4 Status
+
+- Peer node orchestration added to wire tracker registration, heartbeat, sharing, and downloads.
+- End-to-end download flow implemented: tracker swarm discovery -> peer chunk transfer -> local finalize.
+- Resume flow implemented: partial downloads persist and continue after node restart.
+- Tracker metadata upgraded to include chunk hash lists for independent chunk integrity validation.
+- Integration tests added for full transfer and interruption/resume scenarios.
+
 ## Repository Layout
 
 - `src/shardnet/common`: shared constants, settings, logging, and error model.
@@ -105,4 +113,4 @@ shardnet client info
 
 ## Next Milestone
 
-Milestone 4 wires tracker discovery and peer transfer into a full end-to-end download flow.
+Milestone 5 expands the CLI into practical share/download/status commands powered by the shared node core.

@@ -144,6 +144,7 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
                 chunk_size_bytes=payload.chunk_size_bytes,
                 total_chunks=payload.total_chunks,
                 file_sha256=payload.file_sha256,
+                chunk_sha256=payload.chunk_sha256,
                 available_chunks=payload.available_chunks,
             )
         except PeerNotFoundError as error:
@@ -184,6 +185,7 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
             chunk_size_bytes=snapshot.file.chunk_size_bytes,
             total_chunks=snapshot.file.total_chunks,
             file_sha256=snapshot.file.file_sha256,
+            chunk_sha256=snapshot.file.chunk_sha256,
             swarm_size=len(snapshot.peers),
             seed_count=snapshot.seed_count,
             peers=[

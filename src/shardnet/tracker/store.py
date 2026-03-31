@@ -31,6 +31,7 @@ class FileRecord:
     chunk_size_bytes: int
     total_chunks: int
     file_sha256: str
+    chunk_sha256: list[str]
 
 
 @dataclass(frozen=True)
@@ -119,6 +120,7 @@ class TrackerStore:
                     chunk_size_bytes INTEGER NOT NULL,
                     total_chunks INTEGER NOT NULL,
                     file_sha256 TEXT NOT NULL,
+                    chunk_sha256 TEXT NOT NULL,
                     created_at INTEGER NOT NULL,
                     updated_at INTEGER NOT NULL
                 );
@@ -139,6 +141,15 @@ class TrackerStore:
                     ON peer_file_state(info_hash);
                 """
             )
+
+            columns_cursor = await conn.execute("PRAGMA table_info(files)")
+            column_rows = cast(list[Row], await columns_cursor.fetchall())
+            column_names = {str(row["name"]) for row in column_rows}
+            if "chunk_sha256" not in column_names:
+                await conn.execute(
+                    "ALTER TABLE files ADD COLUMN chunk_sha256 TEXT NOT NULL DEFAULT '[]'"
+                )
+
             await conn.commit()
 
     async def cleanup_stale_peers(self, ttl_seconds: int) -> int:
@@ -209,6 +220,7 @@ class TrackerStore:
         chunk_size_bytes: int,
         total_chunks: int,
         file_sha256: str,
+        chunk_sha256: list[str],
         available_chunks: list[int],
     ) -> int:
         """Upsert file metadata and update peer chunk availability."""
@@ -228,7 +240,13 @@ class TrackerStore:
 
             metadata_cursor = await conn.execute(
                 """
-                SELECT file_name, file_size_bytes, chunk_size_bytes, total_chunks, file_sha256
+                SELECT
+                    file_name,
+                    file_size_bytes,
+                    chunk_size_bytes,
+                    total_chunks,
+                    file_sha256,
+                    chunk_sha256
                 FROM files
                 WHERE info_hash = ?
                 """,
@@ -246,10 +264,11 @@ class TrackerStore:
                         chunk_size_bytes,
                         total_chunks,
                         file_sha256,
+                        chunk_sha256,
                         created_at,
                         updated_at
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         info_hash,
@@ -258,6 +277,7 @@ class TrackerStore:
                         chunk_size_bytes,
                         total_chunks,
                         file_sha256,
+                        json.dumps(chunk_sha256, separators=(",", ":")),
                         now,
                         now,
                     ),
@@ -269,6 +289,7 @@ class TrackerStore:
                 chunk_size_bytes=chunk_size_bytes,
                 total_chunks=total_chunks,
                 file_sha256=file_sha256,
+                chunk_sha256=chunk_sha256,
             ):
                 raise FileMetadataConflictError(info_hash)
             else:
@@ -331,6 +352,7 @@ class TrackerStore:
                     file_size_bytes,
                     chunk_size_bytes,
                     total_chunks,
+                    chunk_sha256,
                     file_sha256
                 FROM files
                 WHERE info_hash = ?
@@ -370,6 +392,7 @@ class TrackerStore:
             chunk_size_bytes=int(file_row["chunk_size_bytes"]),
             total_chunks=int(file_row["total_chunks"]),
             file_sha256=str(file_row["file_sha256"]),
+            chunk_sha256=_parse_chunk_hashes(str(file_row["chunk_sha256"])),
         )
 
         peers = [
@@ -397,6 +420,7 @@ def _has_metadata_conflict(
     chunk_size_bytes: int,
     total_chunks: int,
     file_sha256: str,
+    chunk_sha256: list[str],
 ) -> bool:
     return any(
         [
@@ -405,6 +429,7 @@ def _has_metadata_conflict(
             int(row["chunk_size_bytes"]) != chunk_size_bytes,
             int(row["total_chunks"]) != total_chunks,
             str(row["file_sha256"]) != file_sha256,
+            _parse_chunk_hashes(str(row["chunk_sha256"])) != chunk_sha256,
         ]
     )
 
@@ -428,3 +453,15 @@ def _parse_chunks(raw_chunks: str, total_chunks: int) -> list[int]:
         if isinstance(value, int) and 0 <= value < total_chunks:
             normalized.add(value)
     return sorted(normalized)
+
+
+def _parse_chunk_hashes(raw_hashes: str) -> list[str]:
+    try:
+        parsed = json.loads(raw_hashes)
+    except json.JSONDecodeError:
+        return []
+
+    if not isinstance(parsed, list):
+        return []
+
+    return [str(value) for value in parsed if isinstance(value, str)]

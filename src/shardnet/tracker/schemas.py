@@ -44,12 +44,21 @@ class AnnounceFileRequest(BaseModel):
     chunk_size_bytes: int = Field(gt=0)
     total_chunks: int = Field(gt=0)
     file_sha256: str = Field(pattern=HASH_PATTERN)
+    chunk_sha256: list[str] = Field(min_length=1)
     available_chunks: list[int] = Field(default_factory=list)
 
     @field_validator("info_hash", "file_sha256")
     @classmethod
     def normalize_hash(cls, value: str) -> str:
         return value.lower()
+
+    @field_validator("chunk_sha256")
+    @classmethod
+    def normalize_chunk_hashes(cls, values: list[str]) -> list[str]:
+        normalized = [value.lower() for value in values]
+        if any(len(value) != 64 for value in normalized):
+            raise ValueError("chunk_sha256 entries must be SHA-256 hex digests")
+        return normalized
 
     @field_validator("available_chunks")
     @classmethod
@@ -58,6 +67,8 @@ class AnnounceFileRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_chunk_bounds(self) -> "AnnounceFileRequest":
+        if len(self.chunk_sha256) != self.total_chunks:
+            raise ValueError("chunk_sha256 length must equal total_chunks")
         for chunk in self.available_chunks:
             if chunk < 0 or chunk >= self.total_chunks:
                 raise ValueError("available_chunks entries must satisfy 0 <= chunk < total_chunks")
@@ -85,6 +96,7 @@ class SwarmResponse(BaseModel):
     chunk_size_bytes: int
     total_chunks: int
     file_sha256: str
+    chunk_sha256: list[str]
     swarm_size: int
     seed_count: int
     peers: list[SwarmPeerResponse]
