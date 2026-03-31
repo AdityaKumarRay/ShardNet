@@ -1,4 +1,4 @@
-.PHONY: install lint format-check typecheck test run-tracker run-agent run-desktop docker-tracker-up docker-tracker-down
+.PHONY: install lint format-check typecheck test run-tracker run-agent run-desktop desktop-dist docker-tracker-up docker-tracker-down
 
 install:
 	python -m pip install --upgrade pip
@@ -24,6 +24,9 @@ run-agent:
 
 run-desktop:
 	cd desktop && npm install && npm run start
+
+desktop-dist:
+	cd desktop && npm install && npm run dist
 
 docker-tracker-up:
 	docker compose up --build tracker

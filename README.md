@@ -54,6 +54,13 @@ ShardNet is a production-minded, BitTorrent-inspired file sharing system with a 
 - Desktop app starts the local Python agent automatically in development mode.
 - Animated queue bars and live chunk map updates are driven by polling agent job state.
 
+## Milestone 7 Status
+
+- GitHub Actions CI added for lint, format, type-check, and tests.
+- GitHub Actions desktop package workflow added for Linux and Windows artifacts.
+- Deployment guide added under `deploy/README.md`.
+- Build/release commands documented for tracker, CLI, agent, and desktop app.
+
 ## Repository Layout
 
 - `src/shardnet/common`: shared constants, settings, logging, and error model.
@@ -91,6 +98,12 @@ Run desktop app:
 
 ```bash
 make run-desktop
+```
+
+Deployment notes:
+
+```bash
+cat deploy/README.md
 ```
 
 Run tracker in Docker:
@@ -175,4 +188,4 @@ shardnet client info
 
 ## Next Milestone
 
-Milestone 7 finalizes packaging/release workflow and deployment documentation.
+Next milestone options: richer swarm scheduling heuristics, metrics, and installer polish.
